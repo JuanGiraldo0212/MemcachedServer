@@ -1,9 +1,36 @@
 class Entry 
-    def initialize(keyIn,valueIn)
+    def initialize(keyIn,valueIn,size,time)
         @value=valueIn
         @key=keyIn
         @left=nil
         @right=nil
+        @size=size
+        @time=time
+        @cas=0
+    end
+
+    def cas
+        @cas
+    end
+
+    def cas=(cas)
+        @cas=cas
+    end
+
+    def size
+        @size
+    end
+
+    def size=(size)
+        @size=size
+    end
+
+    def time
+        @time
+    end
+
+    def time=(time)
+        @time=time
     end
 
     def value
