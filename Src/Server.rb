@@ -1,13 +1,18 @@
 require_relative "Cache"
+#Class that represents a TCP Server
 class Server
+    #Constructor of the class, receives a port to start the application and the size of the cache
     def initialize(port,size)
         require 'socket'   
         puts("[Server] Server started")
+        #The TCP server is initialized
         @server = TCPServer.new(port.to_i)
+        #The LRU cache is initialized
         @cache=Cache.new(size)
         puts("[Server] Listening for clients...")
     end
 
+    #Method to process a petition of a client, here the Cache is called to serve the client
     def processPetition(data)
         @cache.purgeExpiredKeys
         command=data[0]
@@ -41,9 +46,7 @@ class Server
     end
 
     
-       
-        
-    
+    #Method to handle multiple connections from clients to the server
     def hadleClients
         loop do
             Thread.start(@server.accept) do |connection|

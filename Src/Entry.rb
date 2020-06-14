@@ -1,10 +1,13 @@
+#Class that represents an entry of the cache
 class Entry 
+    #Constructor of the entry, it receives a key, a flag, a size, the ttl and the value
     def initialize(keyIn,flag,size,time,valueIn)
         @value=valueIn
         @key=keyIn
         @left=nil
         @right=nil
         @size=size
+        #Comparation of time to manage the multiple inputs (0, seconds, or unix time)
         if time==0
             @time=0
         elsif time>2592000
@@ -15,6 +18,8 @@ class Entry
         @cas=0
         @flag=flag
     end
+
+    #Getters and setters
 
     def flag
         @flag

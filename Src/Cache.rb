@@ -1,5 +1,7 @@
+#Class that represents the LRU Cache
 class Cache
     require_relative "Entry"
+    #Constructor of the class, it recieves the size of the cache
     def initialize(size)
         @hashmap={}
         @start=nil
@@ -8,6 +10,7 @@ class Cache
         @cas=0
     end
 
+    #Metohd to print the linked list
     def printList
         node = @start
         puts (node.key)
@@ -16,10 +19,12 @@ class Cache
         end
     end
 
+    #Method to get the size of the hashtable
     def getHashSize()
         return @hashmap.size
     end
 
+    #Method that represents the "Get" command, receives a key
     def get(key)
         if @hashmap.key?(key)
             entry=@hashmap[key]
@@ -31,6 +36,7 @@ class Cache
         end
     end
 
+    #Method that represents the "Gets" command, receives a key or multiple keys
     def gets(keys)
         data=""
         keys.each { |key|
@@ -49,6 +55,7 @@ class Cache
         return data
     end
 
+    #Method that returns the current size of the cache
     def cacheSize
         sum=0
         node = @start
@@ -60,6 +67,7 @@ class Cache
         return sum
     end
 
+    #Metohd that represents the command "Add", receives a key, a flag, a size, the ttl and the value
     def add(key,flag,size,time,value)
         if @hashmap.key?(key)
             entry=@hashmap[key]
@@ -81,6 +89,7 @@ class Cache
     
     end
 
+    #Method that removes the items which ttl has come to an end
     def purgeExpiredKeys
         node = @start
         if node.nil? == false
@@ -98,6 +107,7 @@ class Cache
         
     end
 
+    #Method to return the correct time given an int 
     def getTime(time)
         if time==0
             return 0
@@ -108,6 +118,7 @@ class Cache
         end
     end
 
+    #Metohd that represents the command "Append", receives a key, a flag, a size, the ttl and the value
     def append(key,flag,size,time,value)
         if @hashmap.key?(key)
             entry=@hashmap[key]
@@ -124,6 +135,7 @@ class Cache
         
     end
 
+    #Metohd that represents the command "Prepend", receives a key, a flag, a size, the ttl and the value
     def preppend(key,flag,size,time,value)
         if @hashmap.key?(key)
             entry=@hashmap[key]
@@ -139,6 +151,7 @@ class Cache
         end
     end
 
+    #Metohd that represents the command "Replace", receives a key, a flag, a size, the ttl and the value
     def replace(key,flag,size,time,value)
         if @hashmap.key?(key)
             entry=@hashmap[key]
@@ -154,6 +167,7 @@ class Cache
         end
     end
 
+    #Metohd that represents the command "Cas", receives a key, a flag, a size, the ttl, the value and a cas value
     def cas(key,flag,time,size,value,cas)
         if @hashmap.key?(key)
             entry=@hashmap[key]
@@ -171,6 +185,7 @@ class Cache
         end
     end
 
+    #Metohd that represents the command "Set", receives a key, a flag, a size, the ttl and the value
     def set(key,flag,size,time,value)
         if @hashmap.key?(key)
             entry=@hashmap[key]
@@ -195,6 +210,7 @@ class Cache
         return "Data stored successfully"
     end
 
+    #Method to move a node (Item) to the top of the LRU
     def addAtTop(node)
         #puts(node.key)
         node.right=@start
@@ -208,6 +224,7 @@ class Cache
         end
     end
 
+    #Method to remove a node(Item) from the LRU
     def removeNode(node)
         #puts(node.key)
         unless node.left.nil?
