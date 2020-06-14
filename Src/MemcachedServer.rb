@@ -1,7 +1,7 @@
 require_relative "Server"
 puts "Define the server port:"
 port = gets
-puts "Defina the cache size:"
+puts "Define the cache size:"
 size = gets
 
 server=Server.new(port,size)

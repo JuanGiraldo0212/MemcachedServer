@@ -9,27 +9,28 @@ class Server
     end
 
     def processPetition(data)
+        @cache.purgeExpiredKeys
         command=data[0]
 
         if command.eql? "add"
-            @cache.add(data[1],data[2],data[3],data[4])
+            return @cache.add(data[1],data[2],data[3],data[4])
         elsif command.eql? "set"
-            @cache.putEntry(data[1],data[2],data[3],data[4])
+            return @cache.set(data[1],data[2],data[3],data[4],data[5])
 
         elsif command.eql? "replace"
-            @cache.replace(data[1],data[2],data[3],data[4])
+            return @cache.replace(data[1],data[2],data[3],data[4])
 
         elsif command.eql? "append"
-            @cache.append(data[1],data[2],data[3],data[4])
+            return @cache.append(data[1],data[2],data[3],data[4])
 
         elsif command.eql? "prepend"
-            @cache.preppend(data[1],data[2],data[3],data[4])
+            return @cache.preppend(data[1],data[2],data[3],data[4])
 
         elsif command.eql? "cas"
-            @cache.cas(data[1],data[2],data[3],data[4],data[5])
+            return @cache.cas(data[1],data[2],data[3],data[4],data[5],data[6])
 
         elsif command.eql? "get"
-            return @cache.getEntry(key)
+            return @cache.getEntry(data[1])
 
         elsif command.eql? "gets" 
             return @cache.gets(data.drop(1))

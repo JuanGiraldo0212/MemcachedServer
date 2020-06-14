@@ -1,12 +1,27 @@
 class Entry 
-    def initialize(keyIn,valueIn,size,time)
+    def initialize(keyIn,flag,valueIn,size,time)
         @value=valueIn
         @key=keyIn
         @left=nil
         @right=nil
         @size=size
-        @time=time
+        if time==0
+            @time=0
+        elsif time>2592000
+            @time=Time.at(time)
+        else
+            @time=Time.new+time
+        end
         @cas=0
+        @flag=flag
+    end
+
+    def flag
+        @flag
+    end
+
+    def flag=(flag)
+        @flag=flag
     end
 
     def cas

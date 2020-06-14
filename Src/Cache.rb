@@ -49,11 +49,14 @@ class Cache
     def cacheSize
         sum=0
         node = @start
-        sum+=node.size
-        while (node = node.right)
-          sum+=node.size
-        return sum
+        if node.nil? == false
+            sum+=node.size
+            while (node = node.right)
+            sum+=node.size
+            return sum
+            end
         end
+        return sum
     end
 
     def add(key,value,size,time)
@@ -76,6 +79,21 @@ class Cache
         end
     
     end
+
+    def purgeExpiredKeys
+        node = @start
+        if node.time<Time.now and node.time!=0
+            @hashmap.delete(@node.key)
+            removeNode(@node)
+        end
+        while (node = node.right)
+            if node.time<Time.now and node.time!=0
+                @hashmap.delete(@node.key)
+                removeNode(@node)
+            end
+        end
+    end
+
 
     def append(key,value,size,time)
         if @hashmap.key?(key)
@@ -136,16 +154,17 @@ class Cache
         end
     end
 
-    def putEntry(key,value,time,size)
+    def set(key,flag,time,size,value)
         if @hashmap.key?(key)
             entry=@hashmap[key]
             entry.value = value
             entry.size=size
             entry.time=time
+            entry.flag=flag
             removeNode(entry)
             addAtTop(entry)
         else
-            entry=Entry.new(key,value,size,time)
+            entry=Entry.new(key,flag,value,size,time)
             if cacheSize+size > @size
                 @hashmap.delete(@last.key)
                 removeNode(@last)
