@@ -34,13 +34,16 @@ class Cache
     def gets(keys)
         data=""
         keys.each do |key|
+            puts key
             if @hashmap.key?(key)
                 entry=@hashmap[key]
                 removeNode(entry)
                 addAtTop(entry)
                 @cas+=1
                 entry.cas=@cas
-                data+= entry.value + " "+@cas+"\n"
+                data+= entry.value + " "+@cas.to_s+"\n"
+            else
+                data+="Key not found"+"\n"
             end
           end
           return data
@@ -82,54 +85,53 @@ class Cache
 
     def purgeExpiredKeys
         node = @start
-        if node.time<Time.now and node.time!=0
-            @hashmap.delete(@node.key)
-            removeNode(@node)
-        end
-        while (node = node.right)
-            if node.time<Time.now and node.time!=0
-                @hashmap.delete(@node.key)
-                removeNode(@node)
+        if node.nil? == false
+            if node.time!=0 and node.time<Time.now
+                @hashmap.delete(node.key)
+                removeNode(node)
+            end
+            while (node = node.right)
+                if node.time!=0 and node.time<Time.now
+                    @hashmap.delete(node.key)
+                    removeNode(node)
+                end
             end
         end
     end
 
+    def getTime(time)
+        if time==0
+            return 0
+        elsif time>2592000
+            return Time.at(time)
+        else
+            return Time.new+time
+        end
+    end
 
-    def append(key,value,size,time)
+    def append(key,flag,size,time,value)
         if @hashmap.key?(key)
             entry=@hashmap[key]
             entry.value = entry.value+value
             entry.size=size
-            entry.time=time
+            entry.time=getTime(time)
+            entry.flag=flag
             removeNode(entry)
             addAtTop(entry)
             return "Data stored successfully"
         else
-            return "The data does not exist"
+            return "Data does not exist"
         end
         
     end
 
-    def preppend(key,value,size,time)
+    def preppend(key,flag,size,time,value)
         if @hashmap.key?(key)
             entry=@hashmap[key]
             entry.value = value+entry.value
             entry.size=size
-            entry.time=time
-            removeNode(entry)
-            addAtTop(entry)
-            return "Data stored successfully"
-        else
-            return "The data does not exist"
-        end
-    end
-
-    def replace(key,flag,size,time,value)
-        if @hashmap.key?(key)
-            entry=@hashmap[key]
-            entry.value = value
-            entry.size=size
-            entry.time=time
+            entry.time=getTime(time)
+            entry.flag=flag
             removeNode(entry)
             addAtTop(entry)
             return "Data stored successfully"
@@ -138,13 +140,29 @@ class Cache
         end
     end
 
-    def cas(key,value,time,size,cas)
+    def replace(key,flag,size,time,value)
+        if @hashmap.key?(key)
+            entry=@hashmap[key]
+            entry.value = value
+            entry.size=size
+            entry.time=getTime(time)
+            entry.flag=flag
+            removeNode(entry)
+            addAtTop(entry)
+            return "Data stored successfully"
+        else
+            return "Data does not exist"
+        end
+    end
+
+    def cas(key,flag,time,size,value,cas)
         if @hashmap.key?(key)
             entry=@hashmap[key]
             if cas == entry.cas
                 entry.value = value
                 entry.size=size
-                entry.time=time
+                entry.time=getTime(time)
+                entry.flag=flag
                 removeNode(entry)
                 addAtTop(entry)
                 return "Data stored successfully"
@@ -159,7 +177,7 @@ class Cache
             entry=@hashmap[key]
             entry.value = value
             entry.size=size
-            entry.time=time
+            entry.time=getTime(time)
             entry.flag=flag
             removeNode(entry)
             addAtTop(entry)

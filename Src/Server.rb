@@ -13,21 +13,21 @@ class Server
         command=data[0]
 
         if command.eql? "add"
-            return @cache.add(data[1],data[2],data[3],data[4],data[5])
+            return @cache.add(data[1],data[2].to_i,data[3].to_i,data[4].to_i,data[5])
         elsif command.eql? "set"
-            return @cache.set(data[1],data[2],data[3],data[4],data[5])
+            return @cache.set(data[1],data[2].to_i,data[3].to_i,data[4].to_i,data[5])
 
         elsif command.eql? "replace"
-            return @cache.replace(data[1],data[2],data[3],data[4],data[5])
+            return @cache.replace(data[1],data[2].to_i,data[3].to_i,data[4].to_i,data[5])
 
         elsif command.eql? "append"
-            return @cache.append(data[1],data[2],data[3],data[4])
+            return @cache.append(data[1],data[2].to_i,data[3].to_i,data[4].to_i,data[5])
 
         elsif command.eql? "prepend"
-            return @cache.preppend(data[1],data[2],data[3],data[4])
+            return @cache.preppend(data[1],data[2].to_i,data[3].to_i,data[4].to_i,data[5])
 
         elsif command.eql? "cas"
-            return @cache.cas(data[1],data[2],data[3],data[4],data[5],data[6])
+            return @cache.cas(data[1],data[2].to_i,data[3].to_i,data[4].to_i,data[5],data[6].to_i)
 
         elsif command.eql? "get"
             return @cache.get(data[1])
