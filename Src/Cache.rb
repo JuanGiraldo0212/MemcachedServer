@@ -20,14 +20,14 @@ class Cache
         return @hashmap.size
     end
 
-    def getEntry(key)
+    def get(key)
         if @hashmap.key?(key)
             entry=@hashmap[key]
             removeNode(entry)
             addAtTop(entry)
             return entry.value
         else
-            return -1
+            return "Key not found"
         end
     end
 
@@ -59,14 +59,14 @@ class Cache
         return sum
     end
 
-    def add(key,value,size,time)
+    def add(key,flag,size,time,value)
         if @hashmap.key?(key)
             entry=@hashmap[key]
             removeNode(entry)
             addAtTop(entry)
             return "The data already exists"
         else
-            entry=Entry.new(key,value,size,time)
+            entry=Entry.new(key,flag,size,time,value)
             if cacheSize+size > @size
                 @hashmap.delete(@last.key)
                 removeNode(@last)
@@ -124,7 +124,7 @@ class Cache
         end
     end
 
-    def replace(key,value,size,time)
+    def replace(key,flag,size,time,value)
         if @hashmap.key?(key)
             entry=@hashmap[key]
             entry.value = value
@@ -164,7 +164,7 @@ class Cache
             removeNode(entry)
             addAtTop(entry)
         else
-            entry=Entry.new(key,flag,value,size,time)
+            entry=Entry.new(key,flag,size,time,value)
             if cacheSize+size > @size
                 @hashmap.delete(@last.key)
                 removeNode(@last)

@@ -1,5 +1,5 @@
 class Entry 
-    def initialize(keyIn,flag,valueIn,size,time)
+    def initialize(keyIn,flag,size,time,valueIn)
         @value=valueIn
         @key=keyIn
         @left=nil
