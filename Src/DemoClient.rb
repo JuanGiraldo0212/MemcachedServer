@@ -1,11 +1,12 @@
 require 'socket'
-
-s = TCPSocket.new 'localhost', 1234
-
+puts "Server port:"
+port=gets.to_i
+s = TCPSocket.new 'localhost', port
+puts "[Client] Started"
 while line = gets 
     break if line =~ /quit/
     s.puts(line)
-  puts s.gets         
+  puts "[Server] "+ s.gets         
 end
 
 s.close            

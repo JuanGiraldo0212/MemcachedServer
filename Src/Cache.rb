@@ -33,32 +33,30 @@ class Cache
 
     def gets(keys)
         data=""
-        keys.each do |key|
-            puts key
+        keys.each { |key|
             if @hashmap.key?(key)
+
                 entry=@hashmap[key]
                 removeNode(entry)
                 addAtTop(entry)
                 @cas+=1
                 entry.cas=@cas
-                data+= entry.value + " "+@cas.to_s+"\n"
+                data+=entry.value+" "+@cas.to_s+" "
             else
-                data+="Key not found"+"\n"
+                data+="Key not found"
             end
-          end
-          return data
+        }
+        return data
     end
 
     def cacheSize
         sum=0
         node = @start
-        if node.nil? == false
+        while (node.nil? == false)
             sum+=node.size
-            while (node = node.right)
-            sum+=node.size
-            return sum
-            end
+            node=node.right
         end
+        puts sum 
         return sum
     end
 
@@ -97,6 +95,7 @@ class Cache
                 end
             end
         end
+        
     end
 
     def getTime(time)
@@ -172,7 +171,7 @@ class Cache
         end
     end
 
-    def set(key,flag,time,size,value)
+    def set(key,flag,size,time,value)
         if @hashmap.key?(key)
             entry=@hashmap[key]
             entry.value = value
@@ -185,6 +184,7 @@ class Cache
             entry=Entry.new(key,flag,size,time,value)
             if cacheSize+size > @size
                 @hashmap.delete(@last.key)
+                puts "Delted"
                 removeNode(@last)
                 addAtTop(entry) 
             else
