@@ -12,36 +12,48 @@ class Server
         puts("[Server] Listening for clients...")
     end
 
+    def processRetrievalPetition(data)
+        command=data[0]
+    if command.eql? "get"
+        return @cache.get(data.drop(1))
+
+    elsif command.eql? "gets" 
+        return @cache.gets(data.drop(1))
+    else
+        return "ERROR\r\n" 
+    end
+
+    end
     #Method to process a petition of a client, here the Cache is called to serve the client
-    def processPetition(data)
+    def processAdditionPetition(data,value)
         @cache.purgeExpiredKeys
         command=data[0]
+        noreply=false
+
+        if data.length()==5
+            if data[4].eql? "noreply"
+                noreply=true
+            end
+        elsif data.length()==6
+            if data[5].eql? "noreply"
+                noreply=true
+            end
+        end
 
         if command.eql? "add"
-            return @cache.add(data[1],data[2].to_i,data[3].to_i,data[4].to_i,data[5])
+            @cache.add(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
         elsif command.eql? "set"
-            return @cache.set(data[1],data[2].to_i,data[3].to_i,data[4].to_i,data[5])
-
+                @cache.set(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
         elsif command.eql? "replace"
-            return @cache.replace(data[1],data[2].to_i,data[3].to_i,data[4].to_i,data[5])
-
+                @cache.replace(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
         elsif command.eql? "append"
-            return @cache.append(data[1],data[2].to_i,data[3].to_i,data[4].to_i,data[5])
-
+                @cache.append(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
         elsif command.eql? "prepend"
-            return @cache.preppend(data[1],data[2].to_i,data[3].to_i,data[4].to_i,data[5])
-
+                @cache.preppend(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
         elsif command.eql? "cas"
-            return @cache.cas(data[1],data[2].to_i,data[3].to_i,data[4].to_i,data[5],data[6].to_i)
-
-        elsif command.eql? "get"
-            return @cache.get(data[1])
-
-        elsif command.eql? "gets" 
-            return @cache.gets(data.drop(1))
-
+                @cache.cas(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,data[5].to_i,noreply)
         else
-            return command+" is  not listed as a valid command" 
+            "ERROR\r\n"
         end
     end
 
@@ -53,9 +65,26 @@ class Server
                 puts("[Server] Client connected")
               while line = connection.gets
                 break if line =~ /quit/
+                line.delete!("\n")
                 puts "[Client] "+line
                 info=line.split(' ')
-                connection.puts processPetition(info)
+                if info[0].eql? "get" or info[0].eql? "gets"
+                    response=processRetrievalPetition(info)
+                    response=response.gsub("\r\n","-")
+                    connection.puts response
+                else
+                    value=connection.gets
+                    value.delete!("\n")
+                    puts "[Client] "+value
+                    response=processAdditionPetition(info,value)
+                    if response.nil? == false
+                    response=response.gsub("\r\n","-")
+                    connection.puts response
+                    else
+                     connection.puts ""
+                    end
+
+                end
               end
               connection.puts "Closing the connection. Bye!"
               connection.close

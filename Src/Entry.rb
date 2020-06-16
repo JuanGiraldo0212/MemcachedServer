@@ -1,7 +1,7 @@
 #Class that represents an entry of the cache
 class Entry 
     #Constructor of the entry, it receives a key, a flag, a size, the ttl and the value
-    def initialize(keyIn,flag,size,time,valueIn)
+    def initialize(keyIn,flag,time,size,valueIn)
         @value=valueIn
         @key=keyIn
         @left=nil

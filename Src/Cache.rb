@@ -25,15 +25,21 @@ class Cache
     end
 
     #Method that represents the "Get" command, receives a key
-    def get(key)
-        if @hashmap.key?(key)
-            entry=@hashmap[key]
-            removeNode(entry)
-            addAtTop(entry)
-            return entry.value
-        else
-            return "Key not found"
-        end
+    def get(keys)
+        data=""
+        keys.each { |key|
+            if @hashmap.key?(key)
+
+                entry=@hashmap[key]
+                removeNode(entry)
+                addAtTop(entry)
+                @cas+=1
+                entry.cas=@cas
+                data+=entry.value+" "+entry.key.to_s+" "+entry.flag.to_s+" "+entry.size.to_s+"\r\n"
+            end
+        }
+        data+="END\r\n"
+        return data
     end
 
     #Method that represents the "Gets" command, receives a key or multiple keys
@@ -47,11 +53,11 @@ class Cache
                 addAtTop(entry)
                 @cas+=1
                 entry.cas=@cas
-                data+=entry.value+" "+@cas.to_s+" "
-            else
-                data+="Key not found"
+                data+=entry.value+" "+entry.key.to_s+" "+entry.flag.to_s+" "+entry.size.to_s+" "+@cas.to_s+"\r\n"
+            
             end
         }
+        data+="END\r\n"
         return data
     end
 
@@ -68,14 +74,16 @@ class Cache
     end
 
     #Metohd that represents the command "Add", receives a key, a flag, a size, the ttl and the value
-    def add(key,flag,size,time,value)
+    def add(key,flag,time,size,value,noreply)
         if @hashmap.key?(key)
             entry=@hashmap[key]
             removeNode(entry)
             addAtTop(entry)
-            return "The data already exists"
+            if noreply==false
+                "NOT_STORED\r\n"
+            end
         else
-            entry=Entry.new(key,flag,size,time,value)
+            entry=Entry.new(key,flag,time,size,value)
             if cacheSize+size > @size
                 @hashmap.delete(@last.key)
                 removeNode(@last)
@@ -84,7 +92,9 @@ class Cache
                 addAtTop(entry)
             end
             @hashmap[key]=entry
-            return "Data stored successfully"
+            if noreply == false
+                "STORED\r\n"
+            end
         end
     
     end
@@ -119,7 +129,7 @@ class Cache
     end
 
     #Metohd that represents the command "Append", receives a key, a flag, a size, the ttl and the value
-    def append(key,flag,size,time,value)
+    def append(key,flag,time,size,value,noreply)
         if @hashmap.key?(key)
             entry=@hashmap[key]
             entry.value = entry.value+value
@@ -128,15 +138,19 @@ class Cache
             entry.flag=flag
             removeNode(entry)
             addAtTop(entry)
-            return "Data stored successfully"
+            if noreply==false
+                "STORED\r\n"
+            end
         else
-            return "Data does not exist"
+            if noreply==false
+                "NOT_STORED\r\n"
+            end
         end
         
     end
 
     #Metohd that represents the command "Prepend", receives a key, a flag, a size, the ttl and the value
-    def preppend(key,flag,size,time,value)
+    def preppend(key,flag,time,size,value,noreply)
         if @hashmap.key?(key)
             entry=@hashmap[key]
             entry.value = value+entry.value
@@ -145,14 +159,18 @@ class Cache
             entry.flag=flag
             removeNode(entry)
             addAtTop(entry)
-            return "Data stored successfully"
+            if noreply==false
+                "STORED\r\n"
+            end
         else
-            return "Data does not exist"
+            if noreply == false
+                "NOT_STORED\r\n"
+            end
         end
     end
 
     #Metohd that represents the command "Replace", receives a key, a flag, a size, the ttl and the value
-    def replace(key,flag,size,time,value)
+    def replace(key,flag,time,size,value,noreply)
         if @hashmap.key?(key)
             entry=@hashmap[key]
             entry.value = value
@@ -161,14 +179,18 @@ class Cache
             entry.flag=flag
             removeNode(entry)
             addAtTop(entry)
-            return "Data stored successfully"
+            if noreply == false 
+                "STORED\r\n"
+            end
         else
-            return "Data does not exist"
+            if noreply == false
+                "NOT_STORED\r\n"
+            end
         end
     end
 
     #Metohd that represents the command "Cas", receives a key, a flag, a size, the ttl, the value and a cas value
-    def cas(key,flag,time,size,value,cas)
+    def cas(key,flag,time,size,value,cas,noreply)
         if @hashmap.key?(key)
             entry=@hashmap[key]
             if cas == entry.cas
@@ -178,15 +200,23 @@ class Cache
                 entry.flag=flag
                 removeNode(entry)
                 addAtTop(entry)
-                return "Data stored successfully"
+                if noreply==false
+                    "STORED\r\n"
+                end
             else 
-                return "Data has been updated since you read it last"
+                if noreply==false
+                    "EXISTS\r\n"
+                end
+            end
+        else
+            if noreply==false
+                "NOT_FOUND\r\n"
             end
         end
     end
 
     #Metohd that represents the command "Set", receives a key, a flag, a size, the ttl and the value
-    def set(key,flag,size,time,value)
+    def set(key,flag,time,size,value,noreply)
         if @hashmap.key?(key)
             entry=@hashmap[key]
             entry.value = value
@@ -196,10 +226,9 @@ class Cache
             removeNode(entry)
             addAtTop(entry)
         else
-            entry=Entry.new(key,flag,size,time,value)
+            entry=Entry.new(key,flag,time,size,value)
             if cacheSize+size > @size
                 @hashmap.delete(@last.key)
-                puts "Delted"
                 removeNode(@last)
                 addAtTop(entry) 
             else
@@ -207,7 +236,9 @@ class Cache
             end
             @hashmap[key]=entry
         end
-        return "Data stored successfully"
+        if noreply==false
+            "STORED\r\n"
+        end
     end
 
     #Method to move a node (Item) to the top of the LRU

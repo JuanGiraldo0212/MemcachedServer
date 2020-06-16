@@ -9,9 +9,18 @@ puts "[Client] Started"
 while line = gets 
     break if line =~ /quit/
     #The data is passed to the server
-    s.puts(line)
+    data=line.split(" ")
+    if data[0].eql? "get" or data[0].eql? "gets"
+      s.puts(line)
+    else
+      s.puts(line)
+      value=gets
+      s.puts(value)
+    end
     #The server response is printed
-  puts "[Server] "+ s.gets         
+    text=s.gets
+    text=text.gsub "-","\r\n"
+    puts text       
 end
 
 s.close            
