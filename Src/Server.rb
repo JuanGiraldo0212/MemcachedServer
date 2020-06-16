@@ -13,47 +13,57 @@ class Server
     end
 
     def processRetrievalPetition(data)
-        command=data[0]
-    if command.eql? "get"
-        return @cache.get(data.drop(1))
+        @cache.purgeExpiredKeys
+        if data.length()>=2
+            command=data[0]
+            if command.eql? "get"
+                return @cache.get(data.drop(1))
+        
+            elsif command.eql? "gets" 
+                return @cache.gets(data.drop(1))
+            else
+                return "ERROR\r\n" 
+            end
+        else
+            return "CLIENT_ERROR the input doesn't conform to the protocol in some way\r\n"
+        end
 
-    elsif command.eql? "gets" 
-        return @cache.gets(data.drop(1))
-    else
-        return "ERROR\r\n" 
-    end
 
     end
     #Method to process a petition of a client, here the Cache is called to serve the client
     def processAdditionPetition(data,value)
         @cache.purgeExpiredKeys
-        command=data[0]
-        noreply=false
-
-        if data.length()==5
-            if data[4].eql? "noreply"
-                noreply=true
+        if data.length()>=5
+            command=data[0]
+            noreply=false
+    
+            if data.length()==6
+                if data[5].eql? "noreply"
+                    noreply=true
+                end
+            elsif data.length()==7
+                if data[6].eql? "noreply"
+                    noreply=true
+                end
             end
-        elsif data.length()==6
-            if data[5].eql? "noreply"
-                noreply=true
+    
+            if command.eql? "add"
+                @cache.add(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
+            elsif command.eql? "set"
+                    @cache.set(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
+            elsif command.eql? "replace"
+                    @cache.replace(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
+            elsif command.eql? "append"
+                    @cache.append(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
+            elsif command.eql? "prepend"
+                    @cache.preppend(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
+            elsif command.eql? "cas"
+                    @cache.cas(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,data[5].to_i,noreply)
+            else
+                "ERROR\r\n"
             end
-        end
-
-        if command.eql? "add"
-            @cache.add(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
-        elsif command.eql? "set"
-                @cache.set(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
-        elsif command.eql? "replace"
-                @cache.replace(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
-        elsif command.eql? "append"
-                @cache.append(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
-        elsif command.eql? "prepend"
-                @cache.preppend(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,noreply)
-        elsif command.eql? "cas"
-                @cache.cas(data[1],data[2].to_i,data[3].to_i,data[4].to_i,value,data[5].to_i,noreply)
         else
-            "ERROR\r\n"
+            return "CLIENT_ERROR the input doesn't conform to the protocol in some way\r\n"
         end
     end
 

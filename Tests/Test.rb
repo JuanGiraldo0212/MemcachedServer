@@ -10,6 +10,10 @@ describe Cache do
         expect(cache.set("1",30,1000,200,"Test",false)).to eq("STORED\r\n")
     end
 
+    it "Sets a value in the cache normally, noreply" do
+        expect(cache.set("1",30,1000,200,"Test",true)).to eq(nil)
+    end
+
     #########################
     #####Tests for add#######
     #########################
@@ -21,6 +25,10 @@ describe Cache do
     it "Adds a value in the cache and it already exists" do
         cache.set("1",30,1000,200,"Test",false)
         expect(cache.add("1",30,1000,200,"Test",false)).to eq("NOT_STORED\r\n")
+    end
+
+    it "Adds a value in the cache normally, noreply" do
+        expect(cache.add("1",30,1000,200,"Test",true)).to eq(nil)
     end
 
     #########################
@@ -36,6 +44,11 @@ describe Cache do
         expect(cache.replace("1",30,1000,200,"Test",false)).to eq("NOT_STORED\r\n")
     end
 
+    it "Replaces a value in the cache normally, noreply" do
+        cache.set("1",30,1000,200,"Test",false)
+        expect(cache.replace("1",30,1000,200,"Test",true)).to eq(nil)
+    end
+
     #########################
     ####Tests for append#####
     #########################
@@ -49,6 +62,11 @@ describe Cache do
         expect(cache.append("1",30,1000,200,"Ok",false)).to eq("NOT_STORED\r\n")
     end
 
+    it "Appends a value to an already stored value in the cache, noreply" do
+        cache.set("1",30,1000,200,"Test",false)
+        expect(cache.append("1",30,1000,200,"Ok",true)).to eq(nil)
+    end
+
     #########################
     ####Tests for prepend####
     #########################
@@ -60,6 +78,11 @@ describe Cache do
 
     it "Prepends a value in the cache and it does not exist" do
         expect(cache.preppend("1",30,1000,200,"Ok",false)).to eq("NOT_STORED\r\n")
+    end
+
+    it "Prepends a value to an already stored value in the cache, noreply" do
+        cache.set("1",30,1000,200,"Test",false)
+        expect(cache.preppend("1",30,1000,200,"Ok",true)).to eq(nil)
     end
 
     #########################
@@ -77,6 +100,12 @@ describe Cache do
         cache.gets(["1"])
         cache.gets(["1"])
         expect(cache.cas("1",30,1000,200,"Ok",1,false)).to eq("EXISTS\r\n")
+    end
+
+    it "Cas a value to an already stored value in the cache, noreply" do
+        cache.set("1",30,1000,200,"Test",false)
+        cache.gets(["1"])
+        expect(cache.cas("1",30,1000,200,"Ok",1,true)).to eq(nil)
     end
 
     #########################
