@@ -13,6 +13,14 @@ describe Server do
             end
       end
 
+      after(:all) do
+        i=0
+            while i<@clients.length() do
+                @clients[i].close
+                i+=1
+            end
+      end
+
     it "Test concurrent set" do
         i=0
         while i<@clients.length() do
