@@ -33,8 +33,6 @@ class Cache
                 entry=@hashmap[key]
                 removeNode(entry)
                 addAtTop(entry)
-                @cas+=1
-                entry.cas=@cas
                 data+=entry.value+" "+entry.key.to_s+" "+entry.flag.to_s+" "+entry.size.to_s+"\r\n"
             end
         }
