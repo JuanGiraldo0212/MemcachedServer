@@ -23,10 +23,10 @@ A Memcached server that provides a sub-set of commands, like this:
 ## Installation:
 
 Clone this repository to any directory in your machine. Inside the cloned repo you will find a folder named src, and inside a file called MemcachedServer.rb,
-this file should be executed in order to run the server. The command to run it is <ruby MemcachedServer.rb>. After running it the server will ask you on which port
+this file should be executed in order to run the server. The command to run it is ruby MemcachedServer.rb. After running it the server will ask you on which port
 you wish to run it and the size of the cache, after answering the server will start to accept clients. To use the services of the server you must start a TCP client,
-you can do this in several ways, the most common is starting a telnet connection on the same ip and port as the server <telnet localhost 1234>. This project also
-provides a demo client, you can run it by executing the ruby file called Democlient.rb <ruby DemoClient.rb>.
+you can do this in several ways, the most common is starting a telnet connection on the same ip and port as the server telnet (localhost 1234). This project also
+provides a demo client, you can run it by executing the ruby file called Democlient.rb (ruby DemoClient.rb).
 
 ## Usage
 
