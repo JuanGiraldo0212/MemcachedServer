@@ -1,8 +1,8 @@
-require_relative "Server"
+require_relative 'server'
 #Class to define the Memcached server and get some user inputs
-puts "Define the server port:"
+puts 'Define the server port:'
 port = gets
-puts "Define the cache size:"
+puts 'Define the cache size:'
 size = gets
 
 #Server is initialized
