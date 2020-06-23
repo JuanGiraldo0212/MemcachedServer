@@ -30,14 +30,19 @@ class Cache
 		return @hashmap.size
 	end
 
-		#Method that represents the "Get" command, receives a key
+	def get_node(key)
+		entry=@hashmap[key]
+		remove_node(entry)
+		add_at_top(entry)
+		return entry
+	end
+
+		#Method that represents the "Get" command, receives a key or multiple keys
 	def get(keys)
 		data=''
 		keys.each { |key|
 			if @hashmap.key?(key)
-				entry=@hashmap[key]
-				remove_node(entry)
-				add_at_top(entry)
+				entry=get_node(key)
 				data+="#{entry.value} #{entry.key.to_s} #{entry.flag.to_s} #{entry.size.to_s}\r\n"
 			end
 		}
@@ -50,9 +55,7 @@ class Cache
 		data=''
 		keys.each { |key|
 			if @hashmap.key?(key)
-				entry=@hashmap[key]
-				remove_node(entry)
-				add_at_top(entry)
+				entry=get_node(key)
 				@cas+=1
 				entry.cas=@cas
 				data+="#{entry.value} #{entry.key.to_s} #{entry.flag.to_s} #{entry.size.to_s} #{@cas.to_s}\r\n"
@@ -76,9 +79,7 @@ class Cache
 		#Metohd that represents the command "Add", receives a key, a flag, a size, the ttl and the value
 	def add(key,flag,time,size,value,noreply)
 		if @hashmap.key?(key)
-			entry=@hashmap[key]
-			remove_node(entry)
-			add_at_top(entry)
+			entry=get_node(key)
 			if noreply==false
 				NOT_STORED_MESSAGE
 			end
